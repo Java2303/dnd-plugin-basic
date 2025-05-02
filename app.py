@@ -159,5 +159,5 @@ def store_quest():
     return jsonify({"message": "Quest stored successfully", "data": content}), 201
 
 if __name__ == '__main__':
-    create_tables()  # Crear las tablas si no existen
-    app.run(debug=True)
+    create_tables()  # Crear la tabla si no existe
+    app.run(host='0.0.0.0', port=5000, debug=True)
