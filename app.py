@@ -120,26 +120,28 @@ def auto_save():
 
     # Validar que el tipo de datos esté presente
     data_type = content.get("type")
-    if not data_type:
-        return jsonify({"error": "Missing 'type' in the request body."}), 400
+    data = content.get("data")  # Obtener 'data' en lugar de los datos directamente
+
+    if not data_type or not data:
+        return jsonify({"error": "Missing 'type' or 'data' in the request body."}), 400
 
     conn = get_db()
     cursor = conn.cursor()
 
     if data_type == "character":
         # Validar que los datos del personaje estén presentes
-        name = content.get("name")
+        name = data.get("name")
         if not name:
             return jsonify({"error": "Character 'name' is required."}), 400
 
-        # Obtener los otros atributos directamente
-        race = content.get("race", "")
-        character_class = content.get("class", "")
-        level = content.get("level", 1)
-        alignment = content.get("alignment", "")
-        hit_points = content.get("hit_points", 0)
-        equipment = content.get("equipment", [])
-        notes = content.get("notes", "")
+        # Obtener los otros atributos desde 'data'
+        race = data.get("race", "")
+        character_class = data.get("class", "")
+        level = data.get("level", 1)
+        alignment = data.get("alignment", "")
+        hit_points = data.get("hit_points", 0)
+        equipment = data.get("equipment", [])
+        notes = data.get("notes", "")
 
         # Insertar el personaje en la base de datos
         cursor.execute("""
@@ -154,7 +156,7 @@ def auto_save():
         ))
     elif data_type == "lore":
         # Guardar lore
-        title = content.get("title")
+        title = data.get("title")
         if not title:
             return jsonify({"error": "Lore 'title' is required."}), 400
 
@@ -163,8 +165,8 @@ def auto_save():
             VALUES (?, ?, ?)
         """, (
             title,
-            content.get("content", ""),
-            content.get("tags", "")
+            data.get("content", ""),
+            data.get("tags", "")
         ))
     else:
         return jsonify({"error": f"Unsupported type '{data_type}'."}), 400
@@ -173,7 +175,6 @@ def auto_save():
     conn.close()
 
     return jsonify({"message": f"{data_type.capitalize()} saved successfully."}), 201
-
 
 # Descargar la base de datos
 @app.route('/download_db', methods=['GET'])
