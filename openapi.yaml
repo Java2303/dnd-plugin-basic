@@ -83,25 +83,25 @@ paths:
                           type: string
 
   /auto_save:
-    post:
-      summary: Guarda automáticamente los cambios realizados en personajes, lore u otros elementos.
-      operationId: autoSave
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                type:
-                  type: string
-                  description: Tipo de dato a guardar (character, lore, quest, map, etc.).
-                  enum: [character, lore, quest, map]
-                data:
-                  type: object
-                  description: Los datos específicos a guardar.
-      responses:
-        "201":
-          description: Datos guardados automáticamente con éxito.
-        "400":
-          description: Solicitud inválida. Datos faltantes o formato incorrecto.
+  post:
+    summary: Guarda automáticamente los cambios realizados en personajes, lore u otros elementos.
+    operationId: autoSave
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Tipo de dato a guardar (character, lore, quest, map, etc.).
+                enum: [character, lore, quest, map]  # Este enum puede ampliarse según los tipos disponibles.
+              data:
+                type: object
+                description: Los datos específicos a guardar.
+    responses:
+      "201":
+        description: Datos guardados automáticamente con éxito.
+      "400":
+        description: Solicitud inválida. Datos faltantes o formato incorrecto.
