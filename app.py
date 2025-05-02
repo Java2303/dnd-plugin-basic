@@ -120,7 +120,7 @@ def auto_save():
 
     # Validar que el tipo de datos esté presente
     data_type = content.get("type")
-    data = content.get("data")  # Obtener 'data' en lugar de los datos directamente
+    data = content.get("data")  # Obtener los datos completos desde 'data'
 
     if not data_type or not data:
         return jsonify({"error": "Missing 'type' or 'data' in the request body."}), 400
@@ -130,7 +130,7 @@ def auto_save():
 
     if data_type == "character":
         # Validar que los datos del personaje estén presentes
-        name = data.get("name")
+        name = data.get("name")  # Obtener el 'name' desde 'data'
         if not name:
             return jsonify({"error": "Character 'name' is required."}), 400
 
@@ -155,11 +155,12 @@ def auto_save():
             f"Notes: {notes}"  # Descripción del personaje
         ))
     elif data_type == "lore":
-        # Guardar lore
-        title = data.get("title")
+        # Validar que los datos del lore estén presentes
+        title = data.get("title")  # Obtener el 'title' desde 'data'
         if not title:
             return jsonify({"error": "Lore 'title' is required."}), 400
 
+        # Insertar el lore en la base de datos
         cursor.execute("""
             INSERT INTO lore (title, content, tags)
             VALUES (?, ?, ?)
@@ -175,6 +176,7 @@ def auto_save():
     conn.close()
 
     return jsonify({"message": f"{data_type.capitalize()} saved successfully."}), 201
+
 
 # Descargar la base de datos
 @app.route('/download_db', methods=['GET'])
