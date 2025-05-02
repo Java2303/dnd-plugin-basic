@@ -40,6 +40,16 @@ paths:
                     type: string
                 notes:
                   type: string
+                # Se agregan los atributos como objeto JSON
+                attributes:
+                  type: object
+                  properties:
+                    class:
+                      type: string
+                    level:
+                      type: integer
+                    alignment:
+                      type: string
       responses:
         "201":
           description: Personaje guardado con éxito.
