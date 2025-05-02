@@ -118,49 +118,53 @@ def retrieve_characters():
 def auto_save():
     content = request.json
 
-    # Validar que los datos necesarios están presentes
+    # Validar que el tipo de datos esté presente
     data_type = content.get("type")
-    data = content.get("data")
-
-    if not data_type or not data:
-        return jsonify({"error": "Missing 'type' or 'data' in the request body."}), 400
+    if not data_type:
+        return jsonify({"error": "Missing 'type' in the request body."}), 400
 
     conn = get_db()
     cursor = conn.cursor()
 
     if data_type == "character":
-        # Guardar personaje
-        name = data.get("name")
+        # Validar que los datos del personaje estén presentes
+        name = content.get("name")
         if not name:
             return jsonify({"error": "Character 'name' is required."}), 400
-        
-        attributes = data.get("attributes", {})
-        skills = data.get("skills", [])
-        description = data.get("description", "")
 
+        # Obtener los otros atributos directamente
+        race = content.get("race", "")
+        character_class = content.get("class", "")
+        level = content.get("level", 1)
+        alignment = content.get("alignment", "")
+        hit_points = content.get("hit_points", 0)
+        equipment = content.get("equipment", [])
+        notes = content.get("notes", "")
+
+        # Insertar el personaje en la base de datos
         cursor.execute("""
             INSERT INTO characters (name, type, attributes, skills, description)
             VALUES (?, ?, ?, ?, ?)
         """, (
             name,
-            data.get("type", ""),
-            json.dumps(attributes),
-            json.dumps(skills),
-            description
+            race,  # Usamos el campo 'race' como 'type' según tu código
+            json.dumps({"class": character_class, "level": level, "alignment": alignment}),  # Atributos en formato JSON
+            json.dumps(equipment),  # Equipos en formato JSON
+            f"Notes: {notes}"  # Descripción del personaje
         ))
     elif data_type == "lore":
         # Guardar lore
-        title = data.get("title")
+        title = content.get("title")
         if not title:
             return jsonify({"error": "Lore 'title' is required."}), 400
-        
+
         cursor.execute("""
             INSERT INTO lore (title, content, tags)
             VALUES (?, ?, ?)
         """, (
             title,
-            data.get("content", ""),
-            data.get("tags", "")
+            content.get("content", ""),
+            content.get("tags", "")
         ))
     else:
         return jsonify({"error": f"Unsupported type '{data_type}'."}), 400
@@ -169,6 +173,7 @@ def auto_save():
     conn.close()
 
     return jsonify({"message": f"{data_type.capitalize()} saved successfully."}), 201
+
 
 # Descargar la base de datos
 @app.route('/download_db', methods=['GET'])
