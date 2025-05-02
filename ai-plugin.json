@@ -1,0 +1,14 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "D&D Game Plugin",
+  "name_for_model": "dnd_plugin",
+  "description_for_human": "Facilita la gestión de campañas de D&D.",
+  "description_for_model": "Permite a ChatGPT interactuar con un servidor Flask para gestionar información de campañas de D&D.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "/openapi.yaml"
+  }
+}
