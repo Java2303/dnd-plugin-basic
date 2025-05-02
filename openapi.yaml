@@ -4,8 +4,10 @@ info:
   title: D&D Game Plugin API
   version: "1.0.0"
   description: API para gestionar datos de campañas de D&D.
+
 servers:
   - url: https://dnd-plugin-basic.onrender.com
+
 paths:
   /store_character:
     post:
@@ -30,10 +32,6 @@ paths:
                   type: string
                 alignment:
                   type: string
-                abilities:
-                  type: object
-                skills:
-                  type: object
                 hit_points:
                   type: integer
                 equipment:
@@ -45,6 +43,7 @@ paths:
       responses:
         "201":
           description: Personaje guardado con éxito.
+
   /store_lore:
     post:
       summary: Guarda historia o lore.
@@ -65,6 +64,7 @@ paths:
       responses:
         "201":
           description: Lore guardado con éxito.
+
   /store_villain:
     post:
       summary: Guarda un villano.
@@ -91,6 +91,7 @@ paths:
       responses:
         "201":
           description: Villano guardado con éxito.
+
   /store_location:
     post:
       summary: Guarda un lugar.
@@ -111,6 +112,7 @@ paths:
       responses:
         "201":
           description: Lugar guardado con éxito.
+
   /store_quest:
     post:
       summary: Guarda una misión.
