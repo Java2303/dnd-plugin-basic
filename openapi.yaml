@@ -1,10 +1,11 @@
-openapi: 3.0.1
+openapi: 3.1.0
+
 info:
   title: D&D Game Plugin API
   version: "1.0.0"
   description: API para gestionar datos de campañas de D&D.
 servers:
-  - url: http://127.0.0.1:5000
+  - url: https://dnd-plugin-basic.onrender.com
 paths:
   /store_character:
     post:
