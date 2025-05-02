@@ -1,0 +1,16 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "D&D Game Assistant",
+  "name_for_model": "dnd_game_plugin",
+  "description_for_human": "Guarda y recupera datos de tu campaña de D&D, como personajes, mapas y eventos.",
+  "description_for_model": "Permite a ChatGPT interactuar con datos de campañas de D&D almacenados en un servidor Flask.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "http://127.0.0.1:5000/openapi.yaml"
+  },
+  "contact_email": "youremail@example.com",
+  "legal_info_url": "http://127.0.0.1:5000/legal"
+}
