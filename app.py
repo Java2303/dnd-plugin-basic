@@ -116,6 +116,29 @@ def store_character():
 def download_db():
     from flask import send_file
     return send_file('game_data.db', as_attachment=True)
+# Recuperar todos los personajes
+@app.route('/retrieve_characters', methods=['GET'])
+def retrieve_characters():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM characters")
+    rows = cursor.fetchall()
+    
+    characters = []
+    for row in rows:
+        character = {
+            "id": row["id"],
+            "name": row["name"],
+            "type": row["type"],
+            "attributes": eval(row["attributes"]),  # Convertir el string de vuelta a diccionario
+            "skills": eval(row["skills"]),  # Convertir el string de vuelta a lista
+            "description": row["description"]
+        }
+        characters.append(character)
+
+    conn.close()
+    
+    return jsonify({"characters": characters}), 200
 
 
 if __name__ == '__main__':
