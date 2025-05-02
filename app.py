@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 import sqlite3
 import json
 
@@ -10,7 +10,7 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Crear la tabla en la base de datos si no existe
+# Crear las tablas en la base de datos si no existen
 def create_tables():
     conn = get_db()
     cursor = conn.cursor()
@@ -53,51 +53,16 @@ def create_tables():
 def home():
     return jsonify({"message": "Welcome to the D&D Plugin API!"})
 
-# Guardar datos genéricos
-@app.route('/store', methods=['GET', 'POST'])
-def store_data():
-    if request.method == 'GET':
-        return jsonify({"message": "This endpoint requires a POST request with JSON data."}), 405
-    
-    content = request.json
-    key = content.get("key")
-    value = content.get("value")
-    
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO lore (title, content, tags) VALUES (?, ?, ?)", (key, value, ""))
-    conn.commit()
-    conn.close()
-
-    return jsonify({"message": "Data stored successfully", "data": content}), 201
-
-# Recuperar todos los datos
-@app.route('/retrieve', methods=['GET'])
-def retrieve_data():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM lore")
-    rows = cursor.fetchall()
-    data = [{"id": row["id"], "title": row["title"], "content": row["content"], "tags": row["tags"]} for row in rows]
-    conn.close()
-    return jsonify(data), 200
-
-# Limpiar todos los datos de la base de datos
-@app.route('/clear', methods=['POST'])
-def clear_data():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM lore")
-    conn.commit()
-    conn.close()
-    return jsonify({"message": "Data cleared successfully"}), 200
-
 # Guardar un personaje
 @app.route('/store_character', methods=['POST'])
 def store_character():
     content = request.json
 
-    # Extraer los datos enviados
+    # Validar datos obligatorios
+    if not content or not content.get("name"):
+        return jsonify({"error": "El nombre del personaje es obligatorio."}), 400
+
+    # Extraer y procesar datos
     name = content.get("name")
     race = content.get("race")
     character_class = content.get("class")
@@ -108,45 +73,25 @@ def store_character():
     equipment = content.get("equipment", [])
     notes = content.get("notes", "")
 
-    # Crear el diccionario de atributos
-    attributes = {
+    attributes = json.dumps({
         "class": character_class,
         "level": level,
-        "alignment": alignment
-    }
-    
-    # Convertir los atributos a JSON
-    attributes_json = json.dumps(attributes)
+        "alignment": alignment,
+        "hit_points": hit_points
+    })
+    skills = json.dumps(equipment)
+    description = f"Background: {background}, Notes: {notes}"
 
-    # Conexión a la base de datos
     conn = get_db()
     cursor = conn.cursor()
-
-    # Insertar en la base de datos
-    cursor.execute(""" 
-        INSERT INTO characters 
-        (name, type, attributes, skills, description)
+    cursor.execute("""
+        INSERT INTO characters (name, type, attributes, skills, description)
         VALUES (?, ?, ?, ?, ?)
-    """, (
-        name,  # name
-        race,  # type (puedes cambiar el nombre de este campo en la tabla)
-        attributes_json,  # attributes como JSON
-        json.dumps(equipment),  # skills como JSON
-        f"Background: {background}, Notes: {notes}"  # description
-    ))
-
+    """, (name, race, attributes, skills, description))
     conn.commit()
     conn.close()
 
-    return jsonify({
-        "message": "Character stored successfully",
-        "data": content
-    }), 201
-
-@app.route('/download_db', methods=['GET'])
-def download_db():
-    from flask import send_file
-    return send_file('game_data.db', as_attachment=True)
+    return jsonify({"message": "Character stored successfully", "data": content}), 201
 
 # Recuperar todos los personajes
 @app.route('/retrieve_characters', methods=['GET'])
@@ -158,25 +103,22 @@ def retrieve_characters():
 
     characters = []
     for row in rows:
-        # Convertir los atributos de JSON a un diccionario
-        attributes = json.loads(row["attributes"]) if row["attributes"] else {}
-        
-        # Convertir las habilidades de JSON a lista
-        skills = json.loads(row["skills"]) if row["skills"] else []
-
-        character = {
+        characters.append({
             "id": row["id"],
             "name": row["name"],
             "type": row["type"],
-            "attributes": attributes,  # atributos como diccionario
-            "skills": skills,  # habilidades como lista
+            "attributes": json.loads(row["attributes"]),
+            "skills": json.loads(row["skills"]),
             "description": row["description"]
-        }
-        characters.append(character)
+        })
 
     conn.close()
-
     return jsonify({"characters": characters}), 200
+
+# Descargar la base de datos
+@app.route('/download_db', methods=['GET'])
+def download_db():
+    return send_file('game_data.db', as_attachment=True)
 
 if __name__ == '__main__':
     create_tables()
