@@ -1,0 +1,134 @@
+openapi: 3.0.1
+info:
+  title: D&D Game Plugin API
+  version: "1.0.0"
+  description: API para gestionar datos de campañas de D&D.
+servers:
+  - url: http://127.0.0.1:5000
+paths:
+  /store_character:
+    post:
+      summary: Guarda un personaje.
+      operationId: storeCharacter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                race:
+                  type: string
+                class:
+                  type: string
+                level:
+                  type: integer
+                background:
+                  type: string
+                alignment:
+                  type: string
+                abilities:
+                  type: object
+                skills:
+                  type: object
+                hit_points:
+                  type: integer
+                equipment:
+                  type: array
+                  items:
+                    type: string
+                notes:
+                  type: string
+      responses:
+        "201":
+          description: Personaje guardado con éxito.
+  /store_lore:
+    post:
+      summary: Guarda historia o lore.
+      operationId: storeLore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                tags:
+                  type: string
+      responses:
+        "201":
+          description: Lore guardado con éxito.
+  /store_villain:
+    post:
+      summary: Guarda un villano.
+      operationId: storeVillain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                race:
+                  type: string
+                class:
+                  type: string
+                power_level:
+                  type: integer
+                description:
+                  type: string
+                goals:
+                  type: string
+      responses:
+        "201":
+          description: Villano guardado con éxito.
+  /store_location:
+    post:
+      summary: Guarda un lugar.
+      operationId: storeLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                importance:
+                  type: string
+      responses:
+        "201":
+          description: Lugar guardado con éxito.
+  /store_quest:
+    post:
+      summary: Guarda una misión.
+      operationId: storeQuest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                reward:
+                  type: string
+                status:
+                  type: string
+      responses:
+        "201":
+          description: Misión guardada con éxito.
