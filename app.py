@@ -92,26 +92,46 @@ def clear_data():
     return jsonify({"message": "Data cleared successfully"}), 200
 
 # Guardar un personaje
-@app.route('/store_character', methods=['GET', 'POST'])
+@app.route('/store_character', methods=['POST'])
 def store_character():
-    if request.method == 'GET':
-        return jsonify({"message": "This endpoint requires a POST request with JSON data."}), 405
-    
     content = request.json
-    name = content.get("name")
-    type = content.get("type")
-    attributes = content.get("attributes")
-    skills = content.get("skills")
-    description = content.get("description")
 
+    # Extraer los datos enviados
+    name = content.get("name")
+    race = content.get("race")
+    character_class = content.get("class")
+    level = content.get("level")
+    background = content.get("background")
+    alignment = content.get("alignment")
+    hit_points = content.get("hit_points")
+    equipment = content.get("equipment", [])
+    notes = content.get("notes", "")
+
+    # Conexión a la base de datos
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO characters (name, type, attributes, skills, description) VALUES (?, ?, ?, ?, ?)",
-                   (name, type, str(attributes), str(skills), description))
+
+    # Insertar en la base de datos
+    cursor.execute("""
+        INSERT INTO characters 
+        (name, type, attributes, skills, description)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        name,  # name
+        race,  # type (puedes cambiar el nombre de este campo en la tabla)
+        f"Class: {character_class}, Level: {level}, Alignment: {alignment}",  # attributes
+        str(equipment),  # skills (puedes cambiar este campo)
+        f"Background: {background}, Notes: {notes}"  # description
+    ))
+
     conn.commit()
     conn.close()
 
-    return jsonify({"message": "Character stored successfully", "data": content}), 201
+    return jsonify({
+        "message": "Character stored successfully",
+        "data": content
+    }), 201
+
 @app.route('/download_db', methods=['GET'])
 def download_db():
     from flask import send_file
