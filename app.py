@@ -114,6 +114,61 @@ def retrieve_characters():
 
     conn.close()
     return jsonify({"characters": characters}), 200
+@app.route('/auto_save', methods=['POST'])
+def auto_save():
+    content = request.json
+
+    # Validar que los datos necesarios están presentes
+    data_type = content.get("type")
+    data = content.get("data")
+
+    if not data_type or not data:
+        return jsonify({"error": "Missing 'type' or 'data' in the request body."}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if data_type == "character":
+        # Guardar personaje
+        name = data.get("name")
+        if not name:
+            return jsonify({"error": "Character 'name' is required."}), 400
+        
+        attributes = data.get("attributes", {})
+        skills = data.get("skills", [])
+        description = data.get("description", "")
+
+        cursor.execute("""
+            INSERT INTO characters (name, type, attributes, skills, description)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            name,
+            data.get("type", ""),
+            json.dumps(attributes),
+            json.dumps(skills),
+            description
+        ))
+    elif data_type == "lore":
+        # Guardar lore
+        title = data.get("title")
+        if not title:
+            return jsonify({"error": "Lore 'title' is required."}), 400
+        
+        cursor.execute("""
+            INSERT INTO lore (title, content, tags)
+            VALUES (?, ?, ?)
+        """, (
+            title,
+            data.get("content", ""),
+            data.get("tags", "")
+        ))
+    else:
+        return jsonify({"error": f"Unsupported type '{data_type}'."}), 400
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": f"{data_type.capitalize()} saved successfully."}), 201
 
 # Descargar la base de datos
 @app.route('/download_db', methods=['GET'])
