@@ -112,6 +112,11 @@ def store_character():
     conn.close()
 
     return jsonify({"message": "Character stored successfully", "data": content}), 201
+@app.route('/download_db', methods=['GET'])
+def download_db():
+    from flask import send_file
+    return send_file('game_data.db', as_attachment=True)
+
 
 if __name__ == '__main__':
     create_tables()
