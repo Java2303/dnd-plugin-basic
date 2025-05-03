@@ -20,21 +20,45 @@ paths:
                 name:
                   type: string
                   description: Nombre del personaje.
+                  example: "Aragorn"
                 type:
                   type: string
                   description: Tipo del personaje (e.g., héroe, villano).
+                  example: "héroe"
                 attributes:
-                  type: string
-                  description: Atributos del personaje en formato "clave:valor;clave:valor".
+                  type: object
+                  description: Atributos del personaje en formato clave-valor.
+                  additionalProperties:
+                    type: integer
+                  example:
+                    fuerza: 18
+                    destreza: 14
+                    inteligencia: 12
                 skills:
-                  type: string
-                  description: Habilidades del personaje como una cadena separada por comas.
+                  type: array
+                  description: Habilidades del personaje como una lista.
+                  items:
+                    type: string
+                  example: ["Espadachín", "Montar"]
                 description:
                   type: string
                   description: Descripción del personaje.
+                  example: "Un valiente guerrero con habilidades de liderazgo excepcionales."
       responses:
         "201":
           description: Personaje guardado con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Character stored successfully."
+        "400":
+          description: Solicitud inválida.
+        "500":
+          description: Error interno del servidor.
 
   /retrieve_characters:
     get:
@@ -55,15 +79,62 @@ paths:
                       properties:
                         id:
                           type: integer
+                          example: 1
                         name:
                           type: string
+                          example: "Aragorn"
                         type:
                           type: string
+                          example: "héroe"
                         attributes:
                           type: object
+                          description: Atributos en formato clave-valor.
+                          additionalProperties:
+                            type: integer
+                          example:
+                            fuerza: 18
+                            destreza: 14
+                            inteligencia: 12
                         skills:
                           type: array
                           items:
                             type: string
+                          example: ["Espadachín", "Montar"]
                         description:
                           type: string
+                          example: "Un valiente guerrero con habilidades de liderazgo excepcionales."
+        "500":
+          description: Error interno del servidor.
+
+  /download_db:
+    get:
+      summary: Descarga la base de datos completa.
+      operationId: downloadDatabase
+      responses:
+        "200":
+          description: Archivo de la base de datos descargado con éxito.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "500":
+          description: Error interno del servidor.
+
+  /:
+    get:
+      summary: Verifica el estado del servidor.
+      operationId: home
+      responses:
+        "200":
+          description: Mensaje de bienvenida.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Welcome to the D&D Plugin API!"
+        "500":
+          description: Error interno del servidor.
