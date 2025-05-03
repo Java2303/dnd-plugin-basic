@@ -1,13 +1,10 @@
 openapi: 3.1.0
-
 info:
   title: D&D Game Plugin API
   version: "1.0.0"
   description: API para gestionar datos de campañas de D&D.
-
 servers:
   - url: https://dnd-plugin-basic.onrender.com
-
 paths:
   /store_character:
     post:
@@ -25,17 +22,13 @@ paths:
                   description: Nombre del personaje.
                 type:
                   type: string
-                  description: Tipo del personaje.
+                  description: Tipo del personaje (e.g., héroe, villano).
                 attributes:
-                  type: object
-                  additionalProperties:
-                    type: string
-                  description: Atributos del personaje.
+                  type: string
+                  description: Atributos del personaje en formato "clave:valor;clave:valor".
                 skills:
-                  type: array
-                  items:
-                    type: string
-                  description: Habilidades del personaje.
+                  type: string
+                  description: Habilidades del personaje como una cadena separada por comas.
                 description:
                   type: string
                   description: Descripción del personaje.
@@ -68,89 +61,9 @@ paths:
                           type: string
                         attributes:
                           type: object
-                          additionalProperties:
-                            type: string
                         skills:
                           type: array
                           items:
                             type: string
                         description:
                           type: string
-
-# Similar structure for all other entities
-# Example for 'Lore':
-
-  /store_lore:
-    post:
-      summary: Guarda un lore.
-      operationId: storeLore
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  description: Título del lore.
-                content:
-                  type: string
-                  description: Contenido del lore.
-                tags:
-                  type: array
-                  items:
-                    type: string
-                  description: Etiquetas relacionadas.
-      responses:
-        "201":
-          description: Lore guardado con éxito.
-
-  /retrieve_lores:
-    get:
-      summary: Recupera todos los lores.
-      operationId: retrieveLores
-      responses:
-        "200":
-          description: Lista de lores.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  lores:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        title:
-                          type: string
-                        content:
-                          type: string
-                        tags:
-                          type: array
-                          items:
-                            type: string
-
-# Repeat this pattern for the following:
-# - Villains (/store_villain, /retrieve_villains)
-# - NPCs (/store_npc, /retrieve_npcs)
-# - Locations (/store_location, /retrieve_locations)
-# - Factions (/store_faction, /retrieve_factions)
-# - Romances (/store_romance, /retrieve_romances)
-
-# Ruta para descargar la base de datos
-  /download_db:
-    get:
-      summary: Descarga la base de datos SQLite.
-      operationId: downloadDB
-      responses:
-        "200":
-          description: Base de datos descargada con éxito.
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
