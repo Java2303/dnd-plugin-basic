@@ -106,6 +106,76 @@ paths:
         "500":
           description: Error interno del servidor.
 
+  /store_{entity}:
+    post:
+      summary: Guarda un elemento en la tabla especificada.
+      operationId: storeEntity
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [lore, villains, npcs, locations, factions, romances]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del elemento.
+                other_fields:
+                  type: object
+                  description: Otros campos específicos del elemento.
+                  additionalProperties:
+                    type: string
+      responses:
+        "201":
+          description: Elemento guardado con éxito.
+        "400":
+          description: Solicitud inválida.
+        "500":
+          description: Error interno del servidor.
+
+  /retrieve_{entity}:
+    get:
+      summary: Recupera todos los elementos de la tabla especificada.
+      operationId: retrieveEntity
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [lore, villains, npcs, locations, factions, romances]
+      responses:
+        "200":
+          description: Lista de elementos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Mordor"
+                        details:
+                          type: string
+                          example: "Un lugar oscuro y peligroso."
+        "500":
+          description: Error interno del servidor.
+
   /download_db:
     get:
       summary: Descarga la base de datos completa.
