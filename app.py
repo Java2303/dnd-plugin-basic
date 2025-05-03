@@ -31,19 +31,50 @@ def create_tables():
                         content TEXT,
                         tags TEXT)''')
 
-    # Tabla de mapas
-    cursor.execute('''CREATE TABLE IF NOT EXISTS maps (
+    # Tabla de villanos
+    cursor.execute('''CREATE TABLE IF NOT EXISTS villains (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
-                        details TEXT)''')
+                        motivations TEXT,
+                        abilities TEXT,
+                        description TEXT)''')
 
-    # Tabla de inventario
-    cursor.execute('''CREATE TABLE IF NOT EXISTS inventory (
+    # Tabla de NPCs
+    cursor.execute('''CREATE TABLE IF NOT EXISTS npcs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
-                        description TEXT,
-                        owner_id INTEGER,
-                        FOREIGN KEY (owner_id) REFERENCES characters (id))''')
+                        role TEXT,
+                        attributes TEXT,
+                        notes TEXT)''')
+
+    # Tabla de historia
+    cursor.execute('''CREATE TABLE IF NOT EXISTS story (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT NOT NULL,
+                        details TEXT,
+                        outcomes TEXT)''')
+
+    # Tabla de romances
+    cursor.execute('''CREATE TABLE IF NOT EXISTS romances (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        character1 TEXT NOT NULL,
+                        character2 TEXT NOT NULL,
+                        description TEXT)''')
+
+    # Tabla de facciones
+    cursor.execute('''CREATE TABLE IF NOT EXISTS factions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        members TEXT,
+                        objectives TEXT,
+                        description TEXT)''')
+
+    # Tabla de locaciones
+    cursor.execute('''CREATE TABLE IF NOT EXISTS locations (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        details TEXT,
+                        tags TEXT)''')
 
     conn.commit()
     conn.close()
@@ -53,67 +84,56 @@ def create_tables():
 def home():
     return jsonify({"message": "Welcome to the D&D Plugin API!"})
 
-# Guardar un personaje
-@app.route('/store_character', methods=['POST'])
-def store_character():
-    content = request.json
+# Plantilla para rutas de guardar y recuperar
+def create_store_and_retrieve_routes(table_name, singular_name):
+    @app.route(f'/store_{singular_name}', methods=['POST'])
+    def store():
+        content = request.json
 
-    # Validar datos obligatorios
-    if not content or not content.get("name"):
-        return jsonify({"error": "El nombre del personaje es obligatorio."}), 400
+        if not content or not content.get("name"):
+            return jsonify({"error": f"El nombre de {singular_name} es obligatorio."}), 400
 
-    # Extraer y procesar datos
-    name = content.get("name")
-    race = content.get("race")
-    character_class = content.get("class")
-    level = content.get("level")
-    background = content.get("background")
-    alignment = content.get("alignment")
-    hit_points = content.get("hit_points")
-    equipment = content.get("equipment", [])
-    notes = content.get("notes", "")
+        conn = get_db()
+        cursor = conn.cursor()
+        columns = ", ".join(content.keys())
+        placeholders = ", ".join("?" for _ in content.keys())
+        values = tuple(content.values())
+        cursor.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})", values)
+        conn.commit()
+        conn.close()
 
-    attributes = json.dumps({
-        "class": character_class,
-        "level": level,
-        "alignment": alignment,
-        "hit_points": hit_points
-    })
-    skills = json.dumps(equipment)
-    description = f"Background: {background}, Notes: {notes}"
+        return jsonify({"message": f"{singular_name.capitalize()} stored successfully.", "data": content}), 201
 
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO characters (name, type, attributes, skills, description)
-        VALUES (?, ?, ?, ?, ?)
-    """, (name, race, attributes, skills, description))
-    conn.commit()
-    conn.close()
+    @app.route(f'/retrieve_{singular_name}s', methods=['GET'])
+    def retrieve():
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM {table_name}")
+        rows = cursor.fetchall()
+        results = [dict(row) for row in rows]
+        conn.close()
+        return jsonify({f"{singular_name}s": results}), 200
 
-    return jsonify({"message": "Character stored successfully", "data": content}), 201
+    store.__name__ = f"store_{singular_name}"
+    retrieve.__name__ = f"retrieve_{singular_name}s"
+    return store, retrieve
 
-# Recuperar todos los personajes
-@app.route('/retrieve_characters', methods=['GET'])
-def retrieve_characters():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM characters")
-    rows = cursor.fetchall()
+# Generar rutas dinámicamente
+entities = [
+    ("characters", "character"),
+    ("lore", "lore"),
+    ("villains", "villain"),
+    ("npcs", "npc"),
+    ("story", "story"),
+    ("romances", "romance"),
+    ("factions", "faction"),
+    ("locations", "location"),
+]
 
-    characters = []
-    for row in rows:
-        characters.append({
-            "id": row["id"],
-            "name": row["name"],
-            "type": row["type"],
-            "attributes": json.loads(row["attributes"]),
-            "skills": json.loads(row["skills"]),
-            "description": row["description"]
-        })
-
-    conn.close()
-    return jsonify({"characters": characters}), 200
+for table, singular in entities:
+    store_route, retrieve_route = create_store_and_retrieve_routes(table, singular)
+    app.add_url_rule(f'/store_{singular}', view_func=store_route, methods=['POST'])
+    app.add_url_rule(f'/retrieve_{singular}s', view_func=retrieve_route, methods=['GET'])
 
 # Descargar la base de datos
 @app.route('/download_db', methods=['GET'])
