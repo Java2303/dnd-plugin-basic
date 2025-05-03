@@ -81,3 +81,380 @@ paths:
                             type: string
                         description:
                           type: string
+
+  /store_lore:
+    post:
+      summary: Guarda un lore.
+      operationId: storeLore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del lore.
+                content:
+                  type: string
+                  description: Contenido del lore.
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: Etiquetas relacionadas.
+      responses:
+        "201":
+          description: Lore guardado con éxito.
+
+  /retrieve_lores:
+    get:
+      summary: Recupera todos los lores.
+      operationId: retrieveLores
+      responses:
+        "200":
+          description: Lista de lores.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lores:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        content:
+                          type: string
+                        tags:
+                          type: array
+                          items:
+                            type: string
+
+  /store_villain:
+    post:
+      summary: Guarda un villano.
+      operationId: storeVillain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del villano.
+                motivations:
+                  type: string
+                  description: Motivaciones del villano.
+                abilities:
+                  type: string
+                  description: Habilidades del villano.
+                description:
+                  type: string
+                  description: Descripción del villano.
+      responses:
+        "201":
+          description: Villano guardado con éxito.
+
+  /retrieve_villains:
+    get:
+      summary: Recupera todos los villanos.
+      operationId: retrieveVillains
+      responses:
+        "200":
+          description: Lista de villanos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  villains:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        motivations:
+                          type: string
+                        abilities:
+                          type: string
+                        description:
+                          type: string
+
+  /store_npc:
+    post:
+      summary: Guarda un NPC.
+      operationId: storeNPC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del NPC.
+                role:
+                  type: string
+                  description: Rol del NPC.
+                attributes:
+                  type: string
+                  description: Atributos del NPC.
+                notes:
+                  type: string
+                  description: Notas adicionales del NPC.
+      responses:
+        "201":
+          description: NPC guardado con éxito.
+
+  /retrieve_npcs:
+    get:
+      summary: Recupera todos los NPCs.
+      operationId: retrieveNPCs
+      responses:
+        "200":
+          description: Lista de NPCs.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  npcs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        role:
+                          type: string
+                        attributes:
+                          type: string
+                        notes:
+                          type: string
+
+  /store_story:
+    post:
+      summary: Guarda una historia.
+      operationId: storeStory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título de la historia.
+                details:
+                  type: string
+                  description: Detalles de la historia.
+                outcomes:
+                  type: string
+                  description: Posibles desenlaces de la historia.
+      responses:
+        "201":
+          description: Historia guardada con éxito.
+
+  /retrieve_stories:
+    get:
+      summary: Recupera todas las historias.
+      operationId: retrieveStories
+      responses:
+        "200":
+          description: Lista de historias.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        details:
+                          type: string
+                        outcomes:
+                          type: string
+
+  /store_romance:
+    post:
+      summary: Guarda un romance.
+      operationId: storeRomance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                character1:
+                  type: string
+                  description: Nombre del primer personaje.
+                character2:
+                  type: string
+                  description: Nombre del segundo personaje.
+                description:
+                  type: string
+                  description: Descripción del romance.
+      responses:
+        "201":
+          description: Romance guardado con éxito.
+
+  /retrieve_romances:
+    get:
+      summary: Recupera todos los romances.
+      operationId: retrieveRomances
+      responses:
+        "200":
+          description: Lista de romances.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  romances:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        character1:
+                          type: string
+                        character2:
+                          type: string
+                        description:
+                          type: string
+
+  /store_faction:
+    post:
+      summary: Guarda una facción.
+      operationId: storeFaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre de la facción.
+                members:
+                  type: array
+                  items:
+                    type: string
+                  description: Miembros de la facción.
+                objectives:
+                  type: string
+                  description: Objetivos de la facción.
+                description:
+                  type: string
+                  description: Descripción de la facción.
+      responses:
+        "201":
+          description: Facción guardada con éxito.
+
+  /retrieve_factions:
+    get:
+      summary: Recupera todas las facciones.
+      operationId: retrieveFactions
+      responses:
+        "200":
+          description: Lista de facciones.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  factions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        members:
+                          type: array
+                          items:
+                            type: string
+                        objectives:
+                          type: string
+                        description:
+                          type: string
+
+  /store_location:
+    post:
+      summary: Guarda una locación.
+      operationId: storeLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre de la locación.
+                details:
+                  type: string
+                  description: Detalles de la locación.
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: Etiquetas relacionadas.
+      responses:
+        "201":
+          description: Locación guardada con éxito.
+
+  /retrieve_locations:
+    get:
+      summary: Recupera todas las locaciones.
+      operationId: retrieveLocations
+      responses:
+        "200":
+          description: Lista de locaciones.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        details:
+                          type: string
+                        tags:
+                          type: array
+                          items:
+                            type: string
