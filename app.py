@@ -86,37 +86,42 @@ def home():
 
 # Plantilla para rutas de guardar y recuperar
 def create_store_and_retrieve_routes(table_name, singular_name):
-    @app.route(f'/store_{singular_name}', methods=['POST'])
+    # Ruta para almacenar un recurso
+    @app.route(f'/store_{singular_name}', methods=['POST'], endpoint=f'store_{singular_name}')
     def store():
         content = request.json
-
         if not content or not content.get("name"):
-            return jsonify({"error": f"El nombre de {singular_name} es obligatorio."}), 400
+            return jsonify({"error": "El nombre es obligatorio."}), 400
 
         conn = get_db()
         cursor = conn.cursor()
         columns = ", ".join(content.keys())
-        placeholders = ", ".join("?" for _ in content.keys())
+        placeholders = ", ".join(["?"] * len(content))
         values = tuple(content.values())
-        cursor.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})", values)
+
+        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+        cursor.execute(query, values)
         conn.commit()
         conn.close()
 
-        return jsonify({"message": f"{singular_name.capitalize()} stored successfully.", "data": content}), 201
+        return jsonify({"message": f"{singular_name.capitalize()} almacenado con éxito."}), 201
 
-    @app.route(f'/retrieve_{singular_name}s', methods=['GET'])
+    # Ruta para recuperar todos los recursos
+    @app.route(f'/retrieve_{singular_name}', methods=['GET'], endpoint=f'retrieve_{singular_name}')
     def retrieve():
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute(f"SELECT * FROM {table_name}")
+        query = f"SELECT * FROM {table_name}"
+        cursor.execute(query)
         rows = cursor.fetchall()
+
         results = [dict(row) for row in rows]
         conn.close()
+
         return jsonify({f"{singular_name}s": results}), 200
 
-    store.__name__ = f"store_{singular_name}"
-    retrieve.__name__ = f"retrieve_{singular_name}s"
     return store, retrieve
+
 
 # Generar rutas dinámicamente
 entities = [
